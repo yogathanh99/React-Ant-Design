@@ -1,26 +1,72 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { Input, List } from 'antd';
+import styled from 'styled-components';
 
-function App() {
+import TodoItem from './TodoItem';
+
+const Wrapper = styled.div`
+  text-align: center;
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
+const App = () => {
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState('');
+
+  const handleSubmit = () => {
+    if (!input) alert(`You didn't write your todo`);
+    const newTodos = [
+      ...todos,
+      {
+        content: input,
+        date: null,
+        dateString: '',
+        isComplete: false,
+      },
+    ];
+    setTodos(newTodos);
+    setInput('');
+  };
+
+  const handleRemove = index => {
+    const newTodos = todos.filter((_, i) => i !== index);
+
+    setTodos(newTodos);
+  };
+
+  const handleToggle = (index, isComplete) => {
+    const newTodos = [...todos];
+    const completeIndex = newTodos.findIndex((_, i) => i === index);
+    newTodos[completeIndex].isComplete = !isComplete;
+    setTodos(newTodos);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Wrapper>
+      <h1>Simple Todo App</h1>
+      <Input
+        placeholder='Enter your todo'
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        onPressEnter={handleSubmit}
+      />
+      <List
+        locale={{ emptyText: 'No todo items' }}
+        dataSource={todos}
+        renderItem={(todo, i) => (
+          <TodoItem
+            todo={todo}
+            remove={handleRemove}
+            toggle={handleToggle}
+            isComplete={todo.isComplete}
+            index={i}
+          />
+        )}
+      />
+    </Wrapper>
   );
-}
+};
 
 export default App;
